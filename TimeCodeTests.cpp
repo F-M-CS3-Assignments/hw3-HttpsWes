@@ -3,7 +3,24 @@
 #include <assert.h>
 using namespace std;
 
-#include "TimeCode.h"
+#include "timecode.h"
+
+void TimeCode :: SetHours(unsigned int hours);{
+	t = GetTimeCodeAsSeconds(hours, getMinutes(), getSeconds())
+}
+
+
+void TimeCode :: SetMinutes(unsigned int minutes);{	
+    t = ComponentsToSeconds(getHours(), minutes, getSeconds());
+}
+
+
+
+void  TimeCode:: SetSeconds(unsigned int seconds);{
+    t = ComponentsToSeconds(getHours(), getMinutes(), seconds);
+}
+
+
 
 
 void TestComponentsToSeconds(){
