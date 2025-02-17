@@ -15,10 +15,35 @@ void TimeCode :: SetMinutes(unsigned int minutes);{
 }
 
 
-
 void  TimeCode:: SetSeconds(unsigned int seconds);{
     t = ComponentsToSeconds(getHours(), getMinutes(), seconds);
 }
+
+void TimeCode::reset(){
+	t = 0;
+}
+
+TimeCode::TimeCode(unsigned int hr, unsigned int min, long long unsigned int sec) {
+    t = ComponentsToSeconds(hr, min, sec);
+}
+
+ unsigned int TimeCode::getHours() const {
+
+	return t / 3600; // 3600 seconds equals one hour 
+ }
+
+ unsigned int TimeCode ::getMinutes() const{
+
+	 return (t % 3600) / 60; // used % module to get remainder of seconds than divide by 60 to get minutes
+ }
+
+ unsigned int TimeCode ::getSeconds() const {
+	return (t % 60 ) //use % module to calculate the remainding seconds ofr given t
+ }
+
+long long unsigned int TimeCode ::GetTimeCodeAsSeconds(unsigned int hr, unsigned int min, long long unsigned int sec) {
+	return hr * 3600 + min * 60 + sec;
+ }
 
 
 
