@@ -30,8 +30,8 @@ class TimeCode {
     TimeCode operator*(double a) const;
     TimeCode operator/(double a) const;
 
-    bool operator==(const TimeCode& other) const;
-    bool operator!=(const TimeCode& other) const;
+    bool operator == (const TimeCode& other) const;
+    bool operator != (const TimeCode& other) const;
 
     bool operator<(const TimeCode& other) const;
     bool operator<=(const TimeCode& other) const;

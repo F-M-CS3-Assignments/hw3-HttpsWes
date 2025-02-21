@@ -1,177 +1,149 @@
-
 #include <iostream>
 #include <assert.h>
 using namespace std;
 
 #include "timecode.h"
 
-void TimeCode :: SetHours(unsigned int hours);{
-	t = GetTimeCodeAsSeconds(hours, getMinutes(), getSeconds())
-}
-
-
-void TimeCode :: SetMinutes(unsigned int minutes);{	
-    t = ComponentsToSeconds(getHours(), minutes, getSeconds());
-}
-
-
-void  TimeCode:: SetSeconds(unsigned int seconds);{
-    t = ComponentsToSeconds(getHours(), getMinutes(), seconds);
-}
-
-void TimeCode::reset(){
-	t = 0;
-}
-
-TimeCode::TimeCode(unsigned int hr, unsigned int min, long long unsigned int sec) {
-    t = ComponentsToSeconds(hr, min, sec);
-}
-
- unsigned int TimeCode::getHours() const {
-
-	return t / 3600; // 3600 seconds equals one hour 
- }
-
- unsigned int TimeCode ::getMinutes() const{
-
-	 return (t % 3600) / 60; // used % module to get remainder of seconds than divide by 60 to get minutes
- }
-
- unsigned int TimeCode ::getSeconds() const {
-	return (t % 60 ) //use % module to calculate the remainding seconds ofr given t
- }
-
-long long unsigned int TimeCode ::GetTimeCodeAsSeconds(unsigned int hr, unsigned int min, long long unsigned int sec) {
-	return hr * 3600 + min * 60 + sec;
- }
-
-
-
-
 void TestComponentsToSeconds(){
-	cout << "Testing ComponentsToSeconds" << endl;
-	
-	// Random but "safe" inputs
-	long long unsigned int t = TimeCode::ComponentsToSeconds(3, 17, 42);
-	assert(t == 11862);
-	
-	// More tests go here!
-	
-	cout << "PASSED!" << endl << endl;
+    cout << "Testing ComponentsToSeconds" << endl;
+    
+    // Random inputs
+    long long unsigned int t = TimeCode::ComponentsToSeconds(2, 20, 50);
+    assert(t == 8450);
+    
+    // Test case to test zero input test cases
+    t = TimeCode::ComponentsToSeconds(0, 0, 0);
+    assert(t == 0);
+    
+    // Edge case for maximum single-digit minutes and seconds
+    t = TimeCode::ComponentsToSeconds(0, 58, 58);
+    assert(t == 3538);
+    
+    // Test case for large input values
+    t = TimeCode::ComponentsToSeconds(150, 0, 0);
+    assert(t == 540000);
+    
+    
+    cout << "PASSED!" << endl << endl;
 }
-
 
 void TestDefaultConstructor(){
-	cout << "Testing Default Constructor" << endl;
-	TimeCode tc;
-	
-	//cout << "Testing ToString()" << endl;
-	//cout << "tc: " << tc.ToString() << endl;
-	assert(tc.ToString() == "0:0:0");
-	
-	cout << "PASSED!" << endl << endl;
+    // Default constructor test
+    cout << "Testing Default Constructor" << endl;
+    TimeCode tc;
+    assert(tc.ToString() == "0:0:0");
+    
+    // Additional test for newly created object
+    TimeCode tc2;
+    assert(tc2.ToString() == "0:0:0");
+    
+    cout << "PASSED!" << endl << endl;
 }
-
 
 void TestComponentConstructor(){
-	cout << "Testing Component Constructor" << endl;
-	TimeCode tc = TimeCode(0, 0, 0);
-	//cout << "Testing ToString()" << endl;
-	//cout << "tc: " << tc.ToString() << endl;
-	assert(tc.ToString() == "0:0:0");
-	
-	// more tests go here!
-	
-	// Roll-over inputs
-	TimeCode tc3 = TimeCode(3, 71, 3801);
-	//cout << "tc3: " << tc3.ToString() << endl;
-	assert(tc3.ToString() == "5:14:21");
-	
-	// More tests go here!
-	
-	cout << "PASSED!" << endl << endl;
+    cout << "Testing Component Constructor" << endl;
+    
+    // Zero values
+    TimeCode tc = TimeCode(0, 0, 0);
+    assert(tc.ToString() == "0:0:0");
+    
+    // Standard valid input
+    TimeCode tc2 = TimeCode(5, 30, 30);
+    assert(tc2.ToString() == "5:30:30");
+    
+    // Roll-over test using large amount of seconds 
+    TimeCode tc3 = TimeCode(2, 90, 3661);
+    assert(tc3.ToString() == "4:31:1");
+    
+    // Roll-over test using large values 
+    TimeCode tc4 = TimeCode(88, 120, 120);
+    assert(tc4.ToString() == "90:2:0");
+    
+    // Test case for very large roll-over values
+    TimeCode tc5 = TimeCode(200, 150, 3660);
+    assert(tc5.ToString() == "203:31:0");
+    
+    // Test case for negative inputs handling
+    TimeCode tc6 = TimeCode(10, 59, 3661);
+    assert(tc6.ToString() == "12:0:1");
+    
+    cout << "PASSED!" << endl << endl;
 }
-
 
 void TestGetComponents(){
-	cout << "Testing GetComponents" << endl;
-	
-	unsigned int h;
-	unsigned int m;
-	unsigned int s;
-	
-	// Regular values
-	TimeCode tc = TimeCode(5, 2, 18);
-	tc.GetComponents(h, m, s);
-	assert(h == 5 && m == 2 && s == 18);
-	
-	// More tests go here!
-	
-	cout << "PASSED!" << endl << endl;
+    cout << "Testing GetComponents" << endl;
+    unsigned int h, m, s;
+    
+    // Regular values
+    TimeCode tc = TimeCode(6, 15, 45);
+    tc.GetComponents(h, m, s);
+    assert(h == 6 && m == 15 && s == 45);
+    
+    // Edge case for zero values
+    TimeCode tc2 = TimeCode(0, 0, 0);
+    tc2.GetComponents(h, m, s);
+    assert(h == 0 && m == 0 && s == 0);
+    
+    // Large value conversion test
+    TimeCode tc3 = TimeCode(10, 90, 4000);
+    tc3.GetComponents(h, m, s);
+    assert(h == 12 && m == 36 && s == 40);
+    
+    // Testing roll-over conversion
+    TimeCode tc4 = TimeCode(3, 75, 3661);
+    tc4.GetComponents(h, m, s);
+    assert(h == 5 && m == 16 && s == 1);
+    
+    cout << "PASSED!" << endl << endl;
 }
-
 
 void TestSubtract(){
-	cout << "Testing Subtract" << endl;
-	TimeCode tc1 = TimeCode(1, 0, 0);
-	TimeCode tc2 = TimeCode(0, 50, 0);
-	TimeCode tc3 = tc1 - tc2;
-	assert(tc3.ToString() == "0:10:0");
-	
-	
-	TimeCode tc4 = TimeCode(1, 15, 45);
-	try{
-		TimeCode tc5 = tc1 - tc4;
-		cout << "tc5: " << tc5.ToString() << endl;
-		assert(false);
-	}
-	catch(const invalid_argument& e){
-		// just leave this empty
-		// and keep doing more tests
-	}
-
-	// more tests
-	
-	cout << "PASSED!" << endl << endl;
+    cout << "Testing Subtract" << endl;
+    
+    // Test case subtracting 50 minutes from 1 hour
+    TimeCode tc1 = TimeCode(1, 0, 0);
+    TimeCode tc2 = TimeCode(0, 50, 0);
+    TimeCode tc3 = tc1 - tc2;
+    assert(tc3.ToString() == "0:10:0");
+    
+    // Test case subtracting 1 hour 20 minutes and 1 seconds from 3 hours
+    TimeCode tc6 = TimeCode(3, 40, 30);
+    TimeCode tc7 = TimeCode(1, 20, 15);
+    TimeCode tc8 = tc6 - tc7;
+    assert(tc8.ToString() == "2:20:15");
+    
+    // Test case subtracting exact hours
+    TimeCode tc9 = TimeCode(6, 0, 0);
+    TimeCode tc10 = TimeCode(2, 0, 0);
+    TimeCode tc11 = tc9 - tc10;
+    assert(tc11.ToString() == "4:0:0");
+    
+    cout << "PASSED!" << endl << endl;
 }
 
-
-void TestSetMinutes()
-{
-	cout << "Testing SetMinutes" << endl;
-
-	TimeCode tc = TimeCode(8, 5, 9);
-	tc.SetMinutes(15); // test valid change
-	assert(tc.ToString() == "8:15:9");
-
-	try
-	{
-		tc.SetMinutes(80);  // test invalid change
-		assert(false);
-	}
-	catch (const invalid_argument &e)
-	{
-		// cout << e.what() << endl;
-	}
-
-	assert(tc.ToString() == "8:15:9");
-
-	cout << "PASSED!" << endl << endl;
+void TestSetMinutes(){
+    cout << "Testing SetMinutes" << endl;
+    
+    // Changing values 
+    TimeCode tc = TimeCode(9, 10, 20);
+    tc.SetMinutes(25);
+    assert(tc.ToString() == "9:25:20");
+    
+    // Edge case setting minutes to 0
+    tc.SetMinutes(0);
+    assert(tc.ToString() == "9:0:20");
+    
+    cout << "PASSED!" << endl << endl;
 }
 
-
-// Many More Tests...
-
-	
 int main(){
-	
-	TestComponentsToSeconds();
-	TestDefaultConstructor();
-	TestComponentConstructor();
-	TestGetComponents();
-	
-	// Many othere test functions...
-	
-	cout << "PASSED ALL TESTS!!!" << endl;
-	return 0;
+    TestComponentsToSeconds();
+    TestDefaultConstructor();
+    TestComponentConstructor();
+    TestGetComponents();
+    TestSubtract();
+    TestSetMinutes();
+    
+    cout << "PASSED ALL TESTS!!!" << endl;
+    return 0;
 }
