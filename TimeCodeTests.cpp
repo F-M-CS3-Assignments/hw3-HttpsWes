@@ -97,28 +97,78 @@ void TestGetComponents(){
     cout << "PASSED!" << endl << endl;
 }
 
-void TestSubtract(){
-    cout << "Testing Subtract" << endl;
+void TestAddition(){
+    cout << "Testing Addition" << endl;
+    TimeCode tc1(1, 30, 45);
+    TimeCode tc2(2, 15, 30);
     
-    // Test case subtracting 50 minutes from 1 hour
-    TimeCode tc1 = TimeCode(1, 0, 0);
-    TimeCode tc2 = TimeCode(0, 50, 0);
-    TimeCode tc3 = tc1 - tc2;
-    assert(tc3.ToString() == "0:10:0");
+    assert((tc1 + tc2).ToString() == "3:46:15");
+    cout << "PASSED!" << endl;
+}
+
+// Test subtraction
+void TestSubtraction(){
+    cout << "Testing Subtraction" << endl;
+    TimeCode tc1(3, 45, 30);
+    TimeCode tc2(1, 20, 15);
     
-    // Test case subtracting 1 hour 20 minutes and 1 seconds from 3 hours
-    TimeCode tc6 = TimeCode(3, 40, 30);
-    TimeCode tc7 = TimeCode(1, 20, 15);
-    TimeCode tc8 = tc6 - tc7;
-    assert(tc8.ToString() == "2:20:15");
+    assert((tc1 - tc2).ToString() == "2:25:15");
+    assert((tc1 - TimeCode(0, 45, 30)).ToString() == "3:0:0");
     
-    // Test case subtracting exact hours
-    TimeCode tc9 = TimeCode(6, 0, 0);
-    TimeCode tc10 = TimeCode(2, 0, 0);
-    TimeCode tc11 = tc9 - tc10;
-    assert(tc11.ToString() == "4:0:0");
+    try {
+        TimeCode tc3(0, 30, 0);
+        TimeCode tc4(0, 45, 0);
+        tc3 - tc4;
+    } catch (const std::underflow_error &e) {
+        cout << "Caught negative value" << endl;
+    }
     
-    cout << "PASSED!" << endl << endl;
+    cout << "PASSED!" << endl;
+}
+void TestMultiplication(){
+    cout << "Testing Multiplication" << endl;
+    TimeCode tc1(1, 10, 30);
+    
+    assert((tc1 * 2).ToString() == "2:21:0");
+    assert((tc1 * 3).ToString() == "3:31:30");
+    assert((tc1 * 0).ToString() == "0:0:0");
+    
+    cout << "PASSED!" << endl;
+}
+
+// Test division
+void TestDivision(){
+    cout << "Testing Division" << endl;
+    TimeCode tc1(2, 30, 0);
+    
+    assert((tc1 / 2).ToString() == "1:15:0");
+    assert((tc1 / 3).ToString() == "0:50:0");
+    
+    try {
+        TimeCode tc2(1, 0, 0);
+        tc2 / 0;
+    } catch (const std::domain_error &e) {
+        cout << "Caught division by zero error." << endl;
+    }
+    
+    cout << "PASSED!" << endl;
+}
+// Test comparison operators (>, >=, <, <=, ==, !=)
+void TestComparisons(){
+    cout << "Testing Comparisons" << endl;
+    TimeCode tc1(5, 15, 45);
+    TimeCode tc2(4, 59, 59);
+    
+    assert(tc1 > tc2);
+    assert(tc1 >= tc2);
+    assert(tc2 < tc1);
+    assert(tc2 <= tc1);
+    assert(tc1 != tc2);
+    
+    TimeCode tc3(5, 15, 45);
+    assert(tc1 == tc3);
+    
+    cout << "PASSED!" << endl;
 }
 
 void TestSetMinutes(){
@@ -141,7 +191,11 @@ int main(){
     TestDefaultConstructor();
     TestComponentConstructor();
     TestGetComponents();
-    TestSubtract();
+    TestAddition();
+    TestSubtraction();
+    TestMultiplication();
+    TestDivision();
+    TestComparisons();
     TestSetMinutes();
     
     cout << "PASSED ALL TESTS!!!" << endl;
