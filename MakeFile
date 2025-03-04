@@ -1,7 +1,15 @@
 all:
 	g++ -Wall TimeCode.cpp TimeCodeTests.cpp -o tct
-
+	g++ -Wall TimeCode.cpp NasaLunchAnalysis.cpp -o nasa
+	g++ -Wall TimeCode.cpp PaintDryTimer.cpp -o pdt
+	
+run:
+	./pdt
+	
 run:
 	./tct
+
+run:
+	./nasa
 
 try: all run
