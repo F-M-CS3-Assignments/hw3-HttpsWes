@@ -37,17 +37,19 @@ TimeCode extractTimeCode(const string& line) {
         return TimeCode(0, 0, 1); // Return invalid time if format is incorrect
     }
     
+    //extract the time and put in the format (HH:MM:SS)
     vector<string> timeParts = split(dateParts[2], ':');
     if (timeParts.size() < 2) {
         return TimeCode(0, 0, 1);
     }
-    
+    // Convert extracted values into integers
     unsigned int hours = stoi(timeParts[0]);
     unsigned int minutes = stoi(timeParts[1]);
     return TimeCode(hours, minutes, 0);
 }
 
 int main() {
+    // Check if the file opened
     ifstream file("Space_Corrected.csv");
     if (!file.is_open()) {
         cerr << "Error: Unable to open file." << endl;
@@ -56,8 +58,9 @@ int main() {
     
     vector<TimeCode> launchTimes;
     string line;
-    getline(file, line); // Skip the header
-    
+    getline(file, line); // used to skip the header line
+
+    // Read and  uses timecode.cpp to process each line of the CSV file
     while (getline(file, line)) {
         TimeCode tc = extractTimeCode(line);
         if (!(tc.getHours() == 0 && tc.getMinutes() == 0 && tc.getSeconds() == 1)) {
@@ -65,7 +68,8 @@ int main() {
         }
     }
     file.close();
-    
+
+     // If no valid data was found, inform the user and exit
     if (launchTimes.empty()) {
         cout << "No valid launch times found." << endl;
         return 0;

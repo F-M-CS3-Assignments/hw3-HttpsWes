@@ -3,13 +3,13 @@
 // Class: Comp Sci III
 // I Have read the notes
 
-#include <ctime>
-#include <iostream>
-#include <cmath>
-#include <vector>
-#include <cstdlib>
-#include <cassert>
-#include "timecode.h"
+#include <ctime> // for time(0)
+#include <iostream> // for cin and cout
+#include <cmath> // for M_PI and others
+#include <vector> // for vectors (duh)
+#include <cstdlib> // for random
+#include <cassert> // for assert in the tests() function
+#include "timecode.h" // for timecode's (duh)
 
 using namespace std;
 
@@ -51,7 +51,7 @@ void tests() {
 
     // get_time_remaining
     
-    // Small drying time (original test)
+    // Small drying time
     {
         DryingSnapShot dss;
         dss.startTime = time(0);
@@ -73,24 +73,21 @@ void tests() {
 
     // get_sphere_sa 
 
-    // Normal radius (original test)
+    // Normal radius
     {
         double sa = get_sphere_sa(2.0);
         assert(50.2654 < sa && sa < 50.2655);
     }
-
     // Large radius
     {
         double sa = get_sphere_sa(10.0);
         assert(1256.63 < sa && sa < 1256.65);
     }
-
     // Tiny radius
     {
         double sa = get_sphere_sa(0.1);
         assert(0.12 < sa && sa < 0.13);
     }
-
     // Extremely large radius
     {
         double sa = get_sphere_sa(250.0);
@@ -99,34 +96,30 @@ void tests() {
 
     // compute_time_code 
 
-    // Small drying time (original test)
+    // Small drying time 
     {
         TimeCode* tc = compute_time_code(1.0);
         assert(tc->GetTimeCodeAsSeconds() == 1);
         delete tc;
     }
-
     // Medium drying time
     {
         TimeCode* tc = compute_time_code(500.0);
         assert(tc->GetTimeCodeAsSeconds() == 500);
         delete tc;
     }
-
     // Tiny drying time
     {
         TimeCode* tc = compute_time_code(0.5);
         assert(tc->GetTimeCodeAsSeconds() == 0);
         delete tc;
     }
-
     // Extremely large drying time
     {
         TimeCode* tc = compute_time_code(90000.0);
         assert(tc->GetTimeCodeAsSeconds() == 90000);
         delete tc;
     }
-
     // drying_snap_shot_to_string 
 
     // Regular drying snapshot
@@ -191,7 +184,7 @@ int main() {
             }
             cout << "Tracking " << batches.size() << " batches." << endl;
         }
-    } while (choice != 'Q' && choice != 'q');
+    } while (choice != 'Q' && choice != 'q');//Exit program and clear batches
 
     // Clean up allocated memory
     for (auto& batch : batches) {
