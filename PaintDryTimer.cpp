@@ -47,25 +47,117 @@ TimeCode* compute_time_code(double surfaceArea) {
 
 // Unit tests
 void tests() {
-    // Test get_time_remaining
-    DryingSnapShot dss;
-    dss.startTime = time(0);
-    TimeCode tc = TimeCode(0, 0, 7);
-    dss.timeToDry = &tc;
-    long long int ans = get_time_remaining(dss);
-    assert(ans > 6 && ans < 8);
+   
 
-    // Test get_sphere_sa
-    double sa = get_sphere_sa(2.0);
-    assert(50.2654 < sa && sa < 50.2655);
+    // get_time_remaining
+    
+    // Small drying time (original test)
+    {
+        DryingSnapShot dss;
+        dss.startTime = time(0);
+        TimeCode tc = TimeCode(0, 0, 7);  // 7 seconds drying time
+        dss.timeToDry = &tc;
+        long long int ans = get_time_remaining(dss);
+        assert(ans > 6 && ans < 8); // Should be between 6-8 seconds
+    }
 
-    // Test compute_time_code
-    TimeCode* tc2 = compute_time_code(1.0);
-    assert(tc2->GetTimeCodeAsSeconds() == 1);
-    delete tc2;
+    // Large drying time
+    {
+        DryingSnapShot dss;
+        dss.startTime = time(0);
+        TimeCode tc = TimeCode(2, 45, 30); // 2 hours, 45 minutes, 30 seconds
+        dss.timeToDry = &tc;
+        long long int ans = get_time_remaining(dss);
+        assert(ans > 9900 && ans < 9960); // Around 9930 seconds
+    }
+
+    // get_sphere_sa 
+
+    // Normal radius (original test)
+    {
+        double sa = get_sphere_sa(2.0);
+        assert(50.2654 < sa && sa < 50.2655);
+    }
+
+    // Large radius
+    {
+        double sa = get_sphere_sa(10.0);
+        assert(1256.63 < sa && sa < 1256.65);
+    }
+
+    // Tiny radius
+    {
+        double sa = get_sphere_sa(0.1);
+        assert(0.12 < sa && sa < 0.13);
+    }
+
+    // Extremely large radius
+    {
+        double sa = get_sphere_sa(250.0);
+        assert(785398.0 < sa && sa < 785399.0);
+    }
+
+    // compute_time_code 
+
+    // Small drying time (original test)
+    {
+        TimeCode* tc = compute_time_code(1.0);
+        assert(tc->GetTimeCodeAsSeconds() == 1);
+        delete tc;
+    }
+
+    // Medium drying time
+    {
+        TimeCode* tc = compute_time_code(500.0);
+        assert(tc->GetTimeCodeAsSeconds() == 500);
+        delete tc;
+    }
+
+    // Tiny drying time
+    {
+        TimeCode* tc = compute_time_code(0.5);
+        assert(tc->GetTimeCodeAsSeconds() == 0);
+        delete tc;
+    }
+
+    // Extremely large drying time
+    {
+        TimeCode* tc = compute_time_code(90000.0);
+        assert(tc->GetTimeCodeAsSeconds() == 90000);
+        delete tc;
+    }
+
+    // drying_snap_shot_to_string 
+
+    // Regular drying snapshot
+    {
+        DryingSnapShot dss;
+        dss.name = "Batch-Test";
+        dss.startTime = time(0);
+        TimeCode tc = TimeCode(1, 15, 0);  // 1 hour, 15 minutes
+        dss.timeToDry = &tc;
+
+        string result = drying_snap_shot_to_string(dss);
+        assert(result.find("Batch-Test") != string::npos);
+        assert(result.find("1:15:0") != string::npos);
+    }
+
+    // Long drying snapshot
+    {
+        DryingSnapShot dss;
+        dss.name = "MegaDry";
+        dss.startTime = time(0);
+        TimeCode tc = TimeCode(10, 5, 30);  // 10 hours, 5 minutes, 30 seconds
+        dss.timeToDry = &tc;
+
+        string result = drying_snap_shot_to_string(dss);
+        assert(result.find("MegaDry") != string::npos);
+        assert(result.find("10:5:30") != string::npos);
+    }
 
     cout << "ALL TESTS PASSED!" << endl;
 }
+
 
 int main() {
     vector<DryingSnapShot> batches;  // Stores drying snapshots
