@@ -1,45 +1,84 @@
 // Author: Wesley Ihezuo
-// Date: 02/28/2025
+// Date: 03/1/2025
 // Class: Comp Sci III
+// I Have read the notes
 
 #include <ctime>
 #include <iostream>
 #include <cmath>
 #include <vector>
 #include <cstdlib>
+#include "timecode.h"
 
 using namespace std;
 
-struct DryingSnapShot {
-    string name;
-    time_t startTime;
-    double dryingTimeInSeconds;
+// Structure to store drying batch details
+struct DryingBatch {
+    string name;       // Name of batch
+    time_t startTime;  // When drying started
+    TimeCode* timeToDry; // How long it takes to dry
 };
 
-double get_sphere_sa(double rad) {
-    return 4 * M_PI * rad * rad;
+// Get remaining drying time in seconds
+long long int get_time_remaining(DryingBatch batch) {
+    time_t elapsed = time(0) - batch.startTime;
+    long long int remaining = batch.timeToDry->GetTimeCodeAsSeconds() - elapsed;
+    return (remaining > 0) ? remaining : 0;
+}
+
+// Convert batch info to a readable string
+string batch_to_string(DryingBatch batch) {
+    long long int remaining = get_time_remaining(batch);
+    return batch.name + " - " + to_string(remaining) + " seconds left.";
+}
+
+// Get sphere surface area
+double get_sphere_surface(double radius) {
+    return 4 * M_PI * radius * radius;
+}
+
+// Compute drying time based on surface area
+TimeCode* compute_time(double surfaceArea) {
+    return new TimeCode(0, 0, static_cast<long long unsigned int>(surfaceArea));
 }
 
 int main() {
-    vector<DryingSnapShot> dryingBatches;
-    char option;
+    vector<DryingBatch> batches;  // Stores drying batches
+    char choice;
+    
     do {
-        cout << "Choose an option: (A)dd, (V)iew Current Items, (Q)uit: ";
-        cin >> option;
-        if (option == 'A' || option == 'a') {
-            double radius;
-            cout << "radius: ";
-            cin >> radius;
-            double surfaceArea = get_sphere_sa(radius);
-            dryingBatches.push_back({"Batch-" + to_string(rand()), time(0), surfaceArea});
-        } else if (option == 'V' || option == 'v') {
-            for (const auto& batch : dryingBatches) {
-                cout << batch.name << " (takes " << batch.dryingTimeInSeconds << " seconds to dry)" << endl;
-            }
-            cout << dryingBatches.size() << " batches being tracked." << endl;
-        }
-    } while (option != 'Q' && option != 'q');
+        cout << "Choose (A)dd, (V)iew, (Q)uit: ";
+        cin >> choice;
 
+        if (choice == 'A' || choice == 'a') {  // Add a new batch
+            double radius;
+            cout << "Enter radius: ";
+            cin >> radius;
+
+            double surfaceArea = get_sphere_surface(radius);
+            TimeCode* dryingTime = compute_time(surfaceArea);
+
+            batches.push_back({"Batch-" + to_string(rand()), time(0), dryingTime});
+        } 
+        else if (choice == 'V' || choice == 'v') {  // View batches
+            for (size_t i = 0; i < batches.size(); i++) {
+                cout << batch_to_string(batches[i]) << endl;
+
+                // Remove dried batches
+                if (get_time_remaining(batches[i]) == 0) {
+                    delete batches[i].timeToDry;
+                    batches.erase(batches.begin() + i);
+                    i--;
+                }
+            }
+            cout << "Tracking " << batches.size() << " batches." << endl;
+        }
+    } while (choice != 'Q' && choice != 'q');
+
+    // Clean up allocated memory
+    for (auto& batch : batches) {
+        delete batch.timeToDry;
+    }
+    
     return 0;
 }
-
