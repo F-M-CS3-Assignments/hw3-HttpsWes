@@ -29,8 +29,11 @@ long long int get_time_remaining(DryingBatch batch) {
 // Convert batch info to a readable string
 string batch_to_string(DryingBatch batch) {
     long long int remaining = get_time_remaining(batch);
-    return batch.name + " - " + to_string(remaining) + " seconds left.";
+    TimeCode remainingTime(0, 0, remaining); // Convert remaining seconds to TimeCode
+
+    return batch.name + " (takes " + batch.timeToDry->ToString() + " to dry) time remaining: " + remainingTime.ToString();
 }
+
 
 // Get sphere surface area
 double get_sphere_surface(double radius) {
