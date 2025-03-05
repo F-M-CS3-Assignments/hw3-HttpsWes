@@ -25,12 +25,21 @@ void TimeCode::SetHours(unsigned int hours) {
 }
 
 void TimeCode::SetMinutes(unsigned int minutes) {
-    t = ComponentsToSeconds(getHours(), minutes, getSeconds()); //setting minutes
+    if (minutes >= 60) {
+        throw std::invalid_argument("Minutes cannot be 60 or more.");
+    }
+    t = ComponentsToSeconds(getHours(), minutes, getSeconds());
 }
 
+
+
 void TimeCode::SetSeconds(unsigned int seconds) {
-    t = ComponentsToSeconds(getHours(), getMinutes(), seconds);//setting seconds
+    if (seconds >= 60) {
+        throw std::invalid_argument("Seconds cannot be 60 or more.");
+    }
+    t = ComponentsToSeconds(getHours(), getMinutes(), seconds);
 }
+
 
 // Reset function
 void TimeCode::reset() { 
@@ -78,25 +87,28 @@ TimeCode TimeCode::operator+(const TimeCode& other) const {
 }
 
 TimeCode TimeCode::operator-(const TimeCode& other) const {
-    if (t < other.t) {
-        throw std::underflow_error("Subtraction would result in a negative number");
+    if (t < other.t) { //ensure negative numbers a caught
+        throw std::invalid_argument("Subtraction would result in a negative number");
     }
     return TimeCode(0, 0, t - other.t);
 }
 
+
+
 TimeCode TimeCode::operator*(double a) const {
-    if (a < 0) {
+    if (a < 0) { //ensure values must be postive 
         throw std::invalid_argument("Multiplication value must be postive");
     }
     return TimeCode(0, 0, static_cast<long long unsigned int>(t * a));
 }
 
 TimeCode TimeCode::operator/(double a) const {
-    if (a == 0) {
-        throw std::domain_error("Division by zero is not accepted");
+    if (a <= 0) {  // Ensure division by zero OR negative numbers throws an error
+        throw std::invalid_argument("Division by zero or negative numbers is not allowed");
     }
     return TimeCode(0, 0, static_cast<long long unsigned int>(t / a));
 }
+
 
 
 // Comparison Operators
